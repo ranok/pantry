@@ -6,19 +6,18 @@ versions:
   github: xianyi/OpenBLAS/releases/tags
   strip: /^v/
 
-platforms:
-  - linux
-  - darwin/aarch64
+# platforms:
+  # - linux
+  # - darwin/aarch64
   # FIXME: illegal instruction on darwin/x86-64
 
 build:
   dependencies:
-    cmake.org: '*'
-  working-directory: build
+    gnu.org/gcc: '*'
+    gnu.org/make: '*'
   script:
-    - cmake .. -DCMAKE_INSTALL_PREFIX="{{prefix}}" -DCMAKE_BUILD_TYPE=Release
-    - make --jobs {{ hw.concurrency }} $ARGS
-    - make install
+    - make --jobs {{ hw.concurrency }} CC=$CC FC=$FC libs netlib shared
+    - make PREFIX={{prefix}} install
 
     ## removing a redundant directory with a duplicate file
     - run: rm -r openblas/openblas
@@ -28,12 +27,11 @@ build:
         rmdir openblas
         ln -s . openblas
       working-directory: ${{prefix}}/include
-  # FIXME: illegal instruction on darwin/x86-64
-  # line 25:  2290 Illegal instruction: 4  ./a.out
-  # env:
-  #   darwin/x86-64:
-  #     ARGS:
-  #       - TARGET=CORE2
+  env:
+    CC: ${{deps.gnu.org/gcc.prefix}}/bin/gcc
+    FC: ${{deps.gnu.org/gcc.prefix}}/bin/gfortran
+    darwin:
+      DYNAMIC_ARCH: 1
 
 test:
   fixture: |

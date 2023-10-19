@@ -1,0 +1,83 @@
+distributable:
+  url: https://github.com/JuliaLang/julia/releases/download/v{{version}}/julia-{{version}}-full.tar.gz
+  strip-components: 1
+
+versions:
+  github: JuliaLang/julia
+  strip: /^v/
+
+dependencies:
+  curl.se/ca-certs: '*'
+  curl.se: '*'
+  gnu.org/gcc: '*' # requires gfortran
+  gnu.org/gmp: '*'
+  gnu.org/mpfr: '*'
+  libgit2.org: '*'
+  nghttp2.org: '*'
+  libssh2.org: '*'
+  github.com/Mbed-TLS/mbedtls: '*'
+  openblas.net: '*'
+  github.com/p7zip-project/p7zip: '*'
+  pcre.org/v2: '*'
+  github.com/JuliaStrings/utf8proc: '*'
+  zlib.net: ^1
+
+build:
+  dependencies:
+    cmake.org: ^3
+    gnu.org/make: '*'
+    perl.org: ^5
+    python.org: <3.12
+    linux:
+      llvm.org: <17
+      nixos.org/patchelf: '*'
+  script:
+    - make -j{{ hw.concurrency }} $ARGS install
+    - make -C deps USE_SYSTEM_CSL=1 install-csl
+  env:
+    CC: clang
+    CXX: clang++
+    LD: clang
+    ARGS:
+      - VERBOSE=1
+      - USE_BINARYBUILDER=0
+      - prefix={{prefix}}
+      - sysconfdir={{prefix}}/etc
+      - USE_SYSTEM_CSL=1
+      - USE_SYSTEM_PCRE=1
+      - USE_SYSTEM_OPENLIBM=0
+      - USE_SYSTEM_BLAS=1
+      - USE_SYSTEM_LAPACK=1
+      - USE_SYSTEM_GMP=1
+      - USE_SYSTEM_MPFR=1
+      - USE_SYSTEM_LIBSUITESPARSE=0
+      - USE_SYSTEM_UTF8PROC=1
+      - USE_SYSTEM_MBEDTLS=1
+      - USE_SYSTEM_LIBSSH2=1
+      - USE_SYSTEM_NGHTTP2=1
+      - USE_SYSTEM_CURL=1
+      - USE_SYSTEM_LIBGIT2=1
+      - USE_SYSTEM_PATCHELF=1
+      - USE_SYSTEM_ZLIB=1
+      - USE_SYSTEM_P7ZIP=1
+      - LIBBLAS=-lopenblas
+      - LIBBLASNAME=libopenblas
+      - LIBLAPACK=-lopenblas
+      - LIBLAPACKNAME=libopenblas
+      - USE_BLAS64=0
+      - PYTHON=python3
+      - LOCALBASE={{prefix}}
+      - MACOSX_VERSION_MIN=11.0
+
+provides:
+  - bin/julia
+
+test:
+  dependencies:
+    foo.com: '*'  # asterisk means “any version, usually the latest”
+  script:
+    test "$(foo --version)" = {{version}}
+    # if it’s a tool check the version matches
+    # you should run the tool to check it works!
+    # if it's a library then you should *use* the library
+    # don’t forget to check other package.ymls in the pantry for examples!
