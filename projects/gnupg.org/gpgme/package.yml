@@ -23,6 +23,8 @@ build:
     - make install
     - killall gpg-agent || true
   env:
+    # otherwise, our modified home path is too long for gpg-agent's socket preferences
+    GNUPGHOME: $(mktemp -d)
     ARGS:
       - --prefix={{prefix}}
       - --with-libassuan-prefix={{deps.gnupg.org/libassuan.prefix}}
