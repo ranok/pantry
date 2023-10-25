@@ -41,6 +41,7 @@ build:
   dependencies:
     freedesktop.org/pkg-config: '*'
     freetype.org: '*'
+    gnu.org/make: '*'
     darwin:
       tukaani.org/xz: '*'
 
@@ -93,6 +94,8 @@ build:
       - --without-ldap-sasl
       - --without-ndbm
       - --without-gdbm
+    CC: gcc
+    LD: gcc
     darwin:
       ARGS:
         - --enable-dtrace
